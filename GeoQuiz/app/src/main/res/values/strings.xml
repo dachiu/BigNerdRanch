@@ -12,4 +12,6 @@
     <string name="previous_button">Prev</string>
     <string name="correct_toast">Correct!</string>
     <string name="incorrect_toast">Incorrect!</string>
+    <string name="left_arrow">left arrow!</string>
+    <string name="right_arrow">right arrow!</string>
 </resources>
