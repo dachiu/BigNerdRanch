@@ -17,6 +17,7 @@ public class QuizActivity extends AppCompatActivity {
 
     private static final String TAG = "QuizActivity";
     private static final String KEY_INDEX = "index";
+    private static final String KEY_CHEATER = "CheaterFlag";
     private static final int REQUEST_CODE_CHEAT = 0;
 
     private Button mTrueButton;
@@ -46,7 +47,7 @@ public class QuizActivity extends AppCompatActivity {
 
         if(savedInstanceState != null){
             mCurrentIndex = savedInstanceState.getInt(KEY_INDEX, 0);
-            mIsCheater = savedInstanceState.getBoolean(KEY_INDEX, false);
+            mIsCheater = savedInstanceState.getBoolean(KEY_CHEATER, false);
         }
 
         mQuestionTextView = (TextView) findViewById(R.id.question_text_view);
@@ -95,7 +96,6 @@ public class QuizActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 mCurrentIndex = (mCurrentIndex + 1) % mQuestionBank.length;
-                mIsCheater = false;
                 updateQuestion();
             }
         });
@@ -128,6 +128,7 @@ public class QuizActivity extends AppCompatActivity {
                 return;
             }
             mIsCheater = CheatActivity.wasAnswerShown(data);
+            mQuestionBank[mCurrentIndex].setCheater();
         }
     }
 
@@ -154,7 +155,7 @@ public class QuizActivity extends AppCompatActivity {
         super.onSaveInstanceState(savedInstanceState);
         Log.d(TAG, "onSaveInstanceState() called");
         savedInstanceState.putInt(KEY_INDEX, mCurrentIndex);
-        savedInstanceState.putBoolean(KEY_INDEX, mIsCheater);
+        savedInstanceState.putBoolean(KEY_CHEATER, mIsCheater);
     }
 
     @Override
@@ -171,6 +172,17 @@ public class QuizActivity extends AppCompatActivity {
 
     private void updateQuestion() {
         int question = mQuestionBank[mCurrentIndex].getTextResId();
+        boolean wasQuestionShownBefore = mQuestionBank[mCurrentIndex].wasQuestionShownBefore();
+
+        if (!wasQuestionShownBefore) {
+            mQuestionBank[mCurrentIndex].setQuestionShown();
+            mIsCheater = false;
+        } else {
+            Log.d(TAG, "The question was shown before.");
+            mIsCheater = mQuestionBank[mCurrentIndex].isCheater();
+            Log.d(TAG, "cheater?: " + mIsCheater);
+        }
+
         mQuestionTextView.setText(question);
     }
 
